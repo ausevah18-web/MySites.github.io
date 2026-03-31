@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Анализатор привычек</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: "Inter", sans-serif;
+            background: linear-gradient(120deg, #1b263b, #415a77);
+            height: 100vh;
+            overflow-x: hidden;
+            overflow-y: auto;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            color: white;
+        }
+
+        .page {
+            position: absolute;
+            width: 90%;
+            max-width: 800px;
+            padding: 40px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(20px);
+            transition: 0.5s;
+            
+            
+        }
+
+        .active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        h1 {
+            margin-top: 0;
+            font-size: 38px;
+            font-weight: 600;
+        }
+
+        button {
+            padding: 12px 28px;
+            font-size: 18px;
+            border: none;
+            border-radius: 12px;
+            background: #778da9;
+            color: white;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #a8c0d8;
+        }
+
+        input, select, range {
+            width: 100%;
+            padding: 10px;
+            border-radius: 10px;
+            border: none;
+            margin-bottom: 18px;
+            font-size: 16px;
+        }
+
+        .row {
+            display: flex;
+            gap: 20px;
+        }
+        .row > div {
+            flex: 1;
+        }
+
+        #results {
+            margin-top: 20px;
+            background: rgba(255,255,255,0.15);
+            padding: 20px;
+            border-radius: 15px;
+        
+        }
+
+        .start{
+             margin: 0;
+            font-family: "Inter", sans-serif;
+            background: linear-gradient(120deg, #1b263b, #415a77);
+            height: 100vh;
+            overflow-x: hidden;
+            overflow-y: auto;
+            display: flex;
+            justify-content: center;
+            align-items:center;
+            color: white;
+        }
+    </style>
+</head>
+
+
+<div class="start">
+<!-- ░░░ ТИТУЛЬНАЯ СТРАНИЦА ░░░ -->
+<div class="page active" id="home" >
+    <h1>Анализатор привычек</h1>
+    <p style="font-size: 19px; opacity: 0.9;">
+        Добро пожаловать! Здесь ты сможешь проанализировать свой день и получить советы по улучшению привычек.
+    </p>
+    <button onclick="goToAnalyzer()">Начать</button>
+</div>
+</div>
+
+<body>
+
+<!-- ░░░ СТРАНИЦА АНАЛИЗАТОРА ░░░ -->
+<div class="page" id="analyzer">
+
+    <h1>Анализ дня</h1>
+
+    <label>Сколько часов спал?</label>
+    <input type="number" id="sleep">
+
+    <label>Сколько времени был в телефоне (часов)?</label>
+    <input type="number" id="phone">
+
+    <div class="row">
+        <div>
+            <label>Пил ли воду?</label>
+            <select id="water">
+                <option>Да</option>
+                <option>Нет</option>
+            </select>
+        </div>
+        <div>
+            <label>Ел фастфуд?</label>
+            <select id="fastfood">
+                <option>Нет</option>
+                <option>Да</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="row">
+        <div>
+            <label>Делал зарядку?</label>
+            <select id="sport">
+                <option>Нет</option>
+                <option>Да</option>
+            </select>
+        </div>
+        <div>
+            <label>Часов за компьютером</label>
+            <input type="number" id="pc">
+        </div>
+    </div>
+
+    <label>Пил энергетики?</label>
+    <select id="energy">
+        <option>Нет</option>
+        <option>Да</option>
+    </select>
+
+    <label>Стресс (0—10)</label>
+    <input type="range" id="stress" min="0" max="10" value="3">
+
+    <button onclick="analyze()">Проанализировать</button>
+
+    <div id="results"></div>
+</div>
+
+<script>
+function goToAnalyzer() {
+    document.getElementById("home").classList.remove("active");
+    document.getElementById("analyzer").classList.add("active");
+}
+
+function analyze() {
+    let sleep = +document.getElementById("sleep").value;
+    let phone = +document.getElementById("phone").value;
+    let water = document.getElementById("water").value;
+    let fastfood = document.getElementById("fastfood").value;
+    let sport = document.getElementById("sport").value;
+    let pc = +document.getElementById("pc").value;
+    let energy = document.getElementById("energy").value;
+    let stress = +document.getElementById("stress").value;
+
+    let score = 100;
+    let bad = [];
+    let tips = [];
+
+    if (sleep < 7) { score -= 20; bad.push("Недосып"); tips.push("Старайся ложиться на 20–30 минут раньше."); }
+    if (phone > 4) { score -= 15; bad.push("Много телефона"); tips.push("Поставь ограничение экрана на 1–2 часа."); }
+    if (water === "Нет") { score -= 10; bad.push("Мало воды"); tips.push("Выпей стакан воды утром и вечером."); }
+    if (fastfood === "Да") { score -= 15; bad.push("Фастфуд"); tips.push("Замени один прием пищи домашним."); }
+    if (sport === "Нет") { score -= 10; bad.push("Нет активности"); tips.push("Добавь хотя бы 5 минут зарядки."); }
+    if (pc > 5) { score -= 10; bad.push("Много компьютера"); tips.push("Делай минутные перерывы каждый час."); }
+    if (energy === "Да") { score -= 10; bad.push("Энергетики"); tips.push("Попробуй заменить на чай."); }
+    if (stress > 6) { score -= 10; bad.push("Высокий стресс"); tips.push("Попробуй дыхание 4–7–8."); }
+
+    if (score < 0) score = 0;
+
+    let html = `<h2>${score}% — Полезность дня</h2>`;
+
+    if (bad.length === 0) {
+        html += `<p>Отличный день! Никаких вредных привычек 🎉</p>`;
+    } else {
+        html += `<h3>Обнаруженные проблемы:</h3><ul>`;
+        bad.forEach(h => html += `<li>${h}</li>`);
+        html += `</ul>`;
+
+        html += `<h3>Советы:</h3><ul>`;
+        tips.forEach(t => html += `<li>${t}</li>`);
+        html += `</ul>`;
+    }
+
+    document.getElementById("results").innerHTML = html;
+}
+</script>
+
+</body>
+</html>
